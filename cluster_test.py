@@ -1,6 +1,6 @@
 from datasets import load_dataset
 from gensim.models.doc2vec import Doc2Vec, TaggedDocument
-from gensim.utils import tokenize
+from .utils import tokenize
 from sklearn.cluster import KMeans
 import matplotlib.pyplot as plt
 import pandas as pd
