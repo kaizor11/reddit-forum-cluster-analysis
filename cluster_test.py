@@ -9,9 +9,10 @@ import pandas as pd
 ds = load_dataset("FutureMa/EvasionBench", split="train")
 docs = list(ds["answer"])
 
-# first tokenize our texts
+# first tokenize our text
+docs = [list(tokenize(x, to_lower=True)) for x in docs]
 inset = [TaggedDocument(doc, [i]) for i, doc in enumerate(docs)]
-docs = [tokenize(x, to_lower=True) for x in docs]
+
 #print(inset[3])
 
 # generate embeddings of our texts
