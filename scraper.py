@@ -11,6 +11,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+# only for Bright Data
 API_TOKEN = os.getenv("API_TOKEN")
 ZONE = os.getenv("ZONE")
 
@@ -18,7 +19,7 @@ SUBREDDIT_URL = "https://www.reddit.com/r/finance/top.json?limit=1000"
 SUBREDDIT_URL_OLD = "https://old.reddit.com/r/shittysuperpowers/new/"
 
 OUTPUT_FILE = "posts.json"
-STATE_FILE = "state.json"
+STATE_FILE = "state.json" # keeps track of seen post ids
 
 # seen posts
 if os.path.exists(STATE_FILE) and os.path.getsize(STATE_FILE) > 0:
@@ -69,18 +70,6 @@ def scrape_subreddit():
             title = title_tag.text.strip()
             post_link = "https://old.reddit.com" + title_tag["href"]
 
-            # # go to each post link and scrape body data
-            # post_response = requests.get(post_link, headers=headers, timeout=10)
-            # post_soup = BeautifulSoup(post_response.text, "html.parser")
-
-            # # body text
-            # body_div = post_soup.find("div", class_="usertext-body")
-            # body_text = body_div.get_text(separator="\n").strip() if body_div else ""
-
-            # # image
-            # og_image = post_soup.find("meta", property="og:image")
-            # image_url = og_image["content"] if og_image else ""
-
             new_posts.append({
                 "id": post_id,
                 "title": title,
@@ -120,6 +109,7 @@ def scrape_subreddit():
 
     print(f"Collected {len(new_posts)} new posts.")
 
+# next step after scrape_subreddit(). Adds body text and images to each post
 def scrape_posts():
     headers = {
         "User-Agent": "script:reddit-cluster: (by u/InternalReference258)"
@@ -128,7 +118,10 @@ def scrape_posts():
     with open(OUTPUT_FILE, "r") as f:
         posts = json.load(f)
     
+    update_cnt = 0
+    skip_cnt = 0
     for post in posts:
+        # skip scraped posts
         if "body" in post and post["body"]:
             continue
 
@@ -136,6 +129,7 @@ def scrape_posts():
         response = requests.get(url=url, headers=headers, timeout=10)
         if response.status_code != 200:
             print(f"Skipping {url} — Status {response.status_code}")
+            skip_cnt += 1
             continue
         soup = BeautifulSoup(response.text, "html.parser")
 
@@ -147,16 +141,22 @@ def scrape_posts():
         og_image = soup.find("meta", property="og:image")
         image_url = og_image["content"] if og_image else ""
 
-        post["body"] = body_text
-        post["image_url"] = image_url
+        # only update if there is data
+        if body_text or image_url:
+            post["body"] = body_text
+            post["image_url"] = image_url
+
+            # keep track of body text updates
+            update_cnt += 1
 
         time.sleep(2)
 
+    print(f"Updated {update_cnt} posts, skipped {skip_cnt}")
     with open(OUTPUT_FILE, "w") as f:
         json.dump(posts, f, indent=2)
 
         
-
+# needs to be approved by Reddit
 def praw_scraper():
     
     reddit = praw.Reddit(user_agent="USER_AGENT", 
