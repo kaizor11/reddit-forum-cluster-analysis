@@ -107,7 +107,7 @@ def scrape_subreddit():
         with open(STATE_FILE, "w") as f:
             json.dump(list(seen_ids), f)
 
-    print(f"Collected {len(new_posts)} new posts.")
+    print(f"Collected {len(new_posts)} new posts from {url}.")
 
 # next step after scrape_subreddit(). Adds body text and images to each post
 def scrape_posts():
@@ -128,7 +128,7 @@ def scrape_posts():
         url = post["url"]
         response = requests.get(url=url, headers=headers, timeout=10)
         if response.status_code != 200:
-            print(f"Skipping {url} — Status {response.status_code}")
+            # print(f"Skipping {url} — Status {response.status_code}")
             skip_cnt += 1
             continue
         soup = BeautifulSoup(response.text, "html.parser")
@@ -263,8 +263,6 @@ def bright_data_api():
 def main():
     start = time.time()
     scrape_posts()
-
-
     print(f"Execution time: {time.time() - start:2f} seconds")
 if __name__ == "__main__":
     main()
