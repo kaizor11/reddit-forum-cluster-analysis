@@ -23,9 +23,6 @@ def scrape():
     scrape_posts()
     print(f"Execution time: {time.time() - start:2f} seconds")
 
-    print(f"Sleeping for {scrape_interval_min} minutes")
-    time.sleep(scrape_interval_min * 60)
-
 def store():
     pass
 
@@ -85,17 +82,21 @@ def cluster(docs):
 
 def main():
 
-    # scrape data
-    scrape()
+    while True:
+        # scrape data
+        scrape()
 
-    # store data
-    # store()
+        # store data
+        # store()
 
-    # read data
-    # input = preprocess("posts.json")
+        # read data
+        # input = preprocess("posts.json")
 
-    # cluster data
-    # cluster(input)
+        # cluster data
+        # cluster(input)
+
+        print(f"Sleeping for {scrape_interval_min} minutes")
+        time.sleep(scrape_interval_min * 60)
 
 if __name__ == "__main__":
     main()
