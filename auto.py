@@ -10,7 +10,7 @@ import json
 
 from scraper import scrape_subreddit, scrape_posts, SUBREDDIT_URL_OLD
 
-scrape_interval_min = sys.argv[1]
+scrape_interval_min = int(sys.argv[1])
 
 def scrape():
     print(f"Scraping from {SUBREDDIT_URL_OLD}...")
@@ -86,16 +86,16 @@ def cluster(docs):
 def main():
 
     # scrape data
-    #scrape()
+    scrape()
 
     # store data
-    #store()
+    # store()
 
     # read data
-    input = preprocess("posts.json")
+    # input = preprocess("posts.json")
 
     # cluster data
-    cluster(input)
+    # cluster(input)
 
 if __name__ == "__main__":
     main()
