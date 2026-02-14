@@ -2,3 +2,10 @@ pandas
 requests
 beautifulsoup4
 praw
+datasets
+gensim
+sklearn
+matplotlib
+pandas
+nltk
+mplcursors
