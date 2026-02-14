@@ -2,3 +2,8 @@ pandas
 requests
 beautifulsoup4
 praw
+datasets
+gensim.nv
+sklearn
+playwright
+pymongo
