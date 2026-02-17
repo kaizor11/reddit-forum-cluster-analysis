@@ -1,10 +1,9 @@
-pandas
+pandas==3.0.0
 requests==2.32.5
 beautifulsoup4==4.14.3
-datasets
-gensim
-sklearn
-matplotlib
-pandas
-nltk
-mplcursors
+datasets==4.5.0
+gensim==0.10.1
+scikit-learn==1.8.0
+matplotlib==3.10.8
+nltk==3.9.2
+mplcursors==0.7
