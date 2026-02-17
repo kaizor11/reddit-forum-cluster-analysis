@@ -50,7 +50,7 @@ def preprocess(df):
     dataset = []
     for entry in data:
         temp = entry.get("title", "") + " " + entry.get("body", "")
-        
+
         #remove the r/shittysuperpowers end tag
         temp = temp.replace("\n", " ")
         temp = temp.replace("Tell the internet how you will prevent bank robberies and save lives with the worst superpowers in the world here at  r/shittysuperpowers . Be creative and don't hold back. No superpower too awful.   Happy Shitting!", "")
@@ -83,7 +83,19 @@ def cluster(in_docs):
 
     #grab stopwords corpus
     stops = set(stopwords.words('english'))
-    
+
+    #there are some extremely common words in r/shittysuperpowers that don't give much variation in terms of context so remove them
+    addtl_words = ["ability",
+                   "someone",
+                   "make",
+                   "time", # true that there could be time-based superpowers but often accompanied by "rewind", "stop", etc. 
+                   "every",
+                   "power",
+                   "people",
+                   "anyone"]
+    for word in addtl_words:
+        stops.add(word)
+
     docs = [[token for token in doc if token not in stops] for doc in tokens]
 
     inset = [TaggedDocument(doc, [i]) for i, doc in enumerate(docs)]
@@ -111,7 +123,6 @@ def cluster(in_docs):
     points_5d = [list(item) for item in out]
     points_x = [point[0] for point in points_5d]
     points_y = [point[1] for point in points_5d]
-    points_z = [point[2] for point in points_5d]
 
     # create a lookup dict based on the first two dimensions 
     # (probably deterministic enough, and mplcursor doesn't support 3+ dimensions)
@@ -160,7 +171,7 @@ def cluster(in_docs):
     plt.show()
 
     # predict clusters
-    return preds
+    return preds, [" ".join(doc) for doc in docs]
 
 def plot_wordclouds(df, text_col, cluster_col):
     if df.empty: return
@@ -200,7 +211,7 @@ def main():
         scrape()
 
          #store data
-        store()
+        #store()
 
         # retrieve data
         #data_in = retrieve_data()
@@ -210,12 +221,12 @@ def main():
 
         # cluster data
         cluster(input)
-        preds = cluster(input)
+        preds, out_docs = cluster(input)
         
 
         print("Preparing visualization...")
         df = pd.DataFrame({
-            'title': input,   
+            'title': out_docs,   
             'cluster_id': preds    
         })
         print("Generating wordclouds")
