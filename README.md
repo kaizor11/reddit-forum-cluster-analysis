@@ -6,8 +6,8 @@ auto.py is the main program and performs the following:
 - stores the scraped data in a MongoDB Atlas database
 - cluters the data []
 
-**Installing Dependencies**
+**Installing Dependencies** <br>
 `pip install -r requirements.txt`
 
-**Execution**
+**Execution** <br>
 `python auto.py x` where `x` is the time (in minutes) between each run (scrape -> store -> cluster)
