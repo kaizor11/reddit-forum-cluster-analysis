@@ -45,16 +45,18 @@ def retrieve_data():
     return mongo.get_data()
 
 def preprocess(df):
-    print(df.head())
-    data = df.iloc[:,0]
+    df["full"] = df["title"].fillna("") + " " + df["body"].fillna("")
+    data = list(df["full"])
     dataset = []
+
     for entry in data:
-        temp = entry.get("title", "") + " " + entry.get("body", "")
+        temp = entry
 
         #remove the r/shittysuperpowers end tag
         temp = temp.replace("\n", " ")
         temp = temp.replace("Tell the internet how you will prevent bank robberies and save lives with the worst superpowers in the world here at  r/shittysuperpowers . Be creative and don't hold back. No superpower too awful.   Happy Shitting!", "")
         
+        temp = temp.lower() # make str lowercase
         temp = temp.strip() # remove extra whitespace
         temp = temp.translate(str.maketrans('', '', string.punctuation)) # remove punctuation
         dataset.append(temp)
@@ -213,10 +215,11 @@ def main():
         #store()
 
         # retrieve data
-        #data_in = retrieve_data()
+        data_in = retrieve_data()
 
         # read data
-        input = preprocess_json("posts.json")
+        input = preprocess(data_in)
+        #input = preprocess_json("posts.json")
 
         # cluster data
         cluster(input)
