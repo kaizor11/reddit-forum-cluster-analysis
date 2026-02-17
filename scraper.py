@@ -264,6 +264,9 @@ def bright_data_api():
 def main():
     start = time.time()
     scrape_subreddit()
+    print(f"Execution time: {time.time() - start:2f} seconds")
+
+    start = time.time()
     scrape_posts()
     print(f"Execution time: {time.time() - start:2f} seconds")
 if __name__ == "__main__":
