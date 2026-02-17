@@ -4,6 +4,7 @@ from pymongo.server_api import ServerApi
 from pymongo.errors import BulkWriteError
 import pandas as pd
 import json
+import os
 uri = "mongodb+srv://normanisapplying_db_user:DSCI560@redditdb.4g6rz8z.mongodb.net/?appName=redditDB"
 
 # Create a new client and connect to the server
@@ -15,6 +16,7 @@ class MongoDBConnection:
         """
         initialize the database and set 
         """
+        uri = os.getenv("mongo_uri")
         self.client = MongoClient(uri, server_api=ServerApi('1'))
         self.db = self.client[db_name]
         self.collection = self.db[collection_name]

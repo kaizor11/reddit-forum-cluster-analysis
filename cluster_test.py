@@ -5,6 +5,7 @@ from sklearn.cluster import KMeans
 import matplotlib.pyplot as plt
 import pandas as pd
 
+
 # load dataset
 ds = load_dataset("FutureMa/EvasionBench", split="train")
 docs = list(ds["answer"])
