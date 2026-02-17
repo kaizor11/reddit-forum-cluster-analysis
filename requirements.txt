@@ -7,3 +7,5 @@ scikit-learn==1.8.0
 matplotlib==3.10.8
 nltk==3.9.2
 mplcursors==0.7
+pymongo==4.16.0
+wordlcoud==1.9.6
