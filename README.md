@@ -8,7 +8,7 @@ A python script that automatically scrapes the subreddit: r/shittysuperpowers fo
 
 **Setup** <br>
 - Install dependencies using `pip install -r requirements.txt`
-- Setup up a MongoDB Atlas database cluster at https://www.mongodb.com/products/platform/atlas-database. Put your MongoDB API key in a .env file
+- Setup up a MongoDB Atlas database cluster at https://www.mongodb.com/products/platform/atlas-database. Put your MongoDB uri in a .env file
 
 **Execution** <br>
 `python auto.py x` where `x` is the time (in minutes) between each run (scrape -> store -> cluster)
