@@ -148,8 +148,9 @@ def scrape_posts():
 
             # keep track of body text updates
             update_cnt += 1
-
-        time.sleep(2)
+        
+        # current testing shows sleeping may not be necessary
+        # time.sleep(2)
 
     print(f"Updated {update_cnt} posts, skipped {skip_cnt}")
     with open(OUTPUT_FILE, "w") as f:
@@ -262,6 +263,7 @@ def bright_data_api():
 
 def main():
     start = time.time()
+    scrape_subreddit()
     scrape_posts()
     print(f"Execution time: {time.time() - start:2f} seconds")
 if __name__ == "__main__":

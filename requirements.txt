@@ -3,7 +3,9 @@ requests
 beautifulsoup4
 praw
 datasets
-gensim.nv
+gensim
 sklearn
-playwright
-pymongo
+matplotlib
+pandas
+nltk
+mplcursors
