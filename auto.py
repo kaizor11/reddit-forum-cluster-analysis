@@ -40,14 +40,38 @@ def store():
 
     print(f"currently has: {mongo.collection.count_documents({})} instances of data")
 
-def preprocess(json_file):
-    # TODO: replace json_file input with db input (or add as option)
+def retrieve_data():
+    mongo = MongoDBConnection()
+    return mongo.get_data()
+
+def preprocess(df):
+    print(df.head())
+    data = df.iloc[:,0]
+    dataset = []
+    for entry in data:
+        temp = entry.get("title", "") + " " + entry.get("body", "")
+        
+        #remove the r/shittysuperpowers end tag
+        temp = temp.replace("\n", " ")
+        temp = temp.replace("Tell the internet how you will prevent bank robberies and save lives with the worst superpowers in the world here at  r/shittysuperpowers . Be creative and don't hold back. No superpower too awful.   Happy Shitting!", "")
+        
+        temp = temp.strip() # remove extra whitespace
+        temp = temp.translate(str.maketrans('', '', string.punctuation)) # remove punctuation
+        dataset.append(temp)
+    return dataset
+
+def preprocess_json(json_file):
     with open(json_file, "r") as f:
         data = json.load(f) 
 
     dataset = []
     for entry in data:
-        temp = entry.get("title", "") #+ " " + entry.get("body", "")
+        temp = entry.get("title", "") + " " + entry.get("body", "")
+
+        #remove the r/shittysuperpowers end tag
+        temp = temp.replace("\n", " ")
+        temp = temp.replace("Tell the internet how you will prevent bank robberies and save lives with the worst superpowers in the world here at  r/shittysuperpowers . Be creative and don't hold back. No superpower too awful.   Happy Shitting!", "")
+        
         temp = temp.lower() # make str lowercase
         temp = temp.strip() # remove extra whitespace
         temp = temp.translate(str.maketrans('', '', string.punctuation)) # remove punctuation
@@ -178,8 +202,11 @@ def main():
          #store data
         store()
 
+        # retrieve data
+        #data_in = retrieve_data()
+
         # read data
-        input = preprocess("posts.json")
+        input = preprocess_json("posts.json")
 
         # cluster data
         cluster(input)
