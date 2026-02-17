@@ -12,9 +12,12 @@ from nltk.corpus import stopwords
 import nltk
 import mplcursors as mpl
 import numpy as np
+from MongoDBconnection import MongoDBConnection
+from scraper import scrape_subreddit, scrape_posts, SUBREDDIT_URL_OLD
+from wordcloud import WordCloud, STOPWORDS
+import math
 nltk.download('stopwords')
 
-from scraper import scrape_subreddit, scrape_posts, SUBREDDIT_URL_OLD
 
 scrape_interval_min = int(sys.argv[1])
 
@@ -30,7 +33,12 @@ def scrape():
     print(f"Execution time: {time.time() - start:2f} seconds")
 
 def store():
-    pass
+    print("store data in cloud ")
+    mongo = MongoDBConnection()
+
+    mongo.upload_json_file("posts.json")
+
+    print(f"currently has: {mongo.collection.count_documents({})} instances of data")
 
 def preprocess(json_file):
     # TODO: replace json_file input with db input (or add as option)
@@ -130,25 +138,64 @@ def cluster(in_docs):
     # predict clusters
     return preds
 
+def plot_wordclouds(df, text_col, cluster_col):
+    if df.empty: return
+    
+    clusters = sorted(df[cluster_col].unique())
+    n_clusters = len(clusters)
+    cols = 3
+    rows = math.ceil(n_clusters / cols)
+    
+    plt.figure(figsize=(20, 5 * rows))
+
+    for i, c_id in enumerate(clusters):
+        # Join text for this cluster
+        text = " ".join(df[df[cluster_col] == c_id][text_col].astype(str))
+        
+        # Generate cloud
+        wc = WordCloud(width=800, height=400, background_color='white', stopwords=STOPWORDS).generate(text)
+        
+        # Plot
+        plt.subplot(rows, cols, i + 1)
+        plt.imshow(wc, interpolation="bilinear")
+        plt.title(f"Cluster {c_id}", fontsize=14)
+        plt.axis("off")
+
+    plt.tight_layout()
+    plt.savefig("cluster_result.png") 
+    print("Wordcloud saved as 'cluster_result.png'")
+    plt.show()
+
+
 
 def main():
 
     # while True:
     for i in range(1):
-        # scrape data
-        #scrape()
+        #scrape data
+        scrape()
 
-        # store data
-        # store()
+         #store data
+        store()
 
         # read data
         input = preprocess("posts.json")
 
         # cluster data
         cluster(input)
+        preds = cluster(input)
+        
 
-        #print(f"Sleeping for {scrape_interval_min} minutes")
-        #time.sleep(scrape_interval_min * 60)
+        print("Preparing visualization...")
+        df = pd.DataFrame({
+            'title': input,   
+            'cluster_id': preds    
+        })
+        print("Generating wordclouds")
+        plot_wordclouds(df, text_col='title', cluster_col='cluster_id')
+        
+        print(f"Sleeping for {scrape_interval_min} minutes")
+        time.sleep(scrape_interval_min * 60)
 
 if __name__ == "__main__":
     main()
