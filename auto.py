@@ -84,7 +84,7 @@ def cluster(in_docs):
     #grab stopwords corpus
     stops = set(stopwords.words('english'))
 
-    #there are some extremely common words in r/shittysuperpowers that don't give much variation in terms of context so remove them
+    #there are some extremely common words in r/shittysuperpowers that don't give much context
     addtl_words = ["ability",
                    "someone",
                    "make",
@@ -144,7 +144,6 @@ def cluster(in_docs):
     #print(lookup_x)
     
     # sample viz showing just first 3 dims
-    # TODO: resolve negative sqrt error
     def display_annotations(cursor):
         xinds = lookup_x[round(cursor.target[0], 4)]
         yinds = lookup_y[round(cursor.target[1], 4)]
