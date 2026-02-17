@@ -2,10 +2,10 @@ pandas==3.0.0
 requests==2.32.5
 beautifulsoup4==4.14.3
 datasets==4.5.0
-gensim==0.10.1
+gensim==4.4.0
 scikit-learn==1.8.0
 matplotlib==3.10.8
 nltk==3.9.2
 mplcursors==0.7
 pymongo==4.16.0
-wordlcoud==1.9.6
+wordcloud==1.9.6
