@@ -162,43 +162,8 @@ def plot_wordclouds(df, text_col, cluster_col):
         plt.axis("off")
 
     plt.tight_layout()
-    plt.savefig("cluster_result.png") # Saves the image!
+    plt.savefig("cluster_result.png") 
     print("Wordcloud saved as 'cluster_result.png'")
-    plt.show()
-
-
-def plot_clusters(df, text_col, cluster_col):
-  
- 
-    if cluster_col not in df.columns:
-        print(f"Error: Column '{cluster_col}' not found.")
-        return
-
- 
-    clusters = sorted(df[cluster_col].unique())
-    n_clusters = len(clusters)
-    
- 
-    cols = 3
-    rows = math.ceil(n_clusters / cols)
-    plt.figure(figsize=(20, 5 * rows))
-
-
-    for i, c_id in enumerate(clusters):
-       
-        text = " ".join(df[df[cluster_col] == c_id][text_col].astype(str))
-        
-       
-        wc = WordCloud(width=800, height=400, background_color='white', stopwords=STOPWORDS).generate(text)
-        
-        # Plot
-        plt.subplot(rows, cols, i + 1)
-        plt.imshow(wc, interpolation="bilinear")
-        plt.title(f"Cluster {c_id}", fontsize=14)
-        plt.axis("off")
-
-    plt.tight_layout()
-    plt.savefig("cluster_wordclouds.png") # Saves image to current folder
     plt.show()
 
 
@@ -207,20 +172,30 @@ def main():
 
     # while True:
     for i in range(1):
-        # scrape data
-        #scrape()
+        #scrape data
+        scrape()
 
-        # store data
-        # store()
+         #store data
+        store()
 
         # read data
         input = preprocess("posts.json")
 
         # cluster data
         cluster(input)
+        preds = cluster(input)
+        
 
-        #print(f"Sleeping for {scrape_interval_min} minutes")
-        #time.sleep(scrape_interval_min * 60)
+        print("Preparing visualization...")
+        df = pd.DataFrame({
+            'title': input,   
+            'cluster_id': preds    
+        })
+        print("Generating wordclouds")
+        plot_wordclouds(df, text_col='title', cluster_col='cluster_id')
+        
+        print(f"Sleeping for {scrape_interval_min} minutes")
+        time.sleep(scrape_interval_min * 60)
 
 if __name__ == "__main__":
     main()
