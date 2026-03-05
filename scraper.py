@@ -1,8 +1,8 @@
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
-import praw
-from praw.models import MoreComments
+# import praw
+# from praw.models import MoreComments
 import json
 import time
 import sys
