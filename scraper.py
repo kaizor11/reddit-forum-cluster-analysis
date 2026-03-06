@@ -1,5 +1,6 @@
 import pandas as pd
 import requests
+from requests.exceptions import RequestException
 from bs4 import BeautifulSoup
 # import praw
 # from praw.models import MoreComments
@@ -39,13 +40,12 @@ def scrape_subreddit():
     url = SUBREDDIT_URL_OLD
 
     while url:
-        response = requests.get(url, headers=headers, timeout=10)
-        # if response.status_code == 429:
-        #     print("Rate limited. Sleeping 30 seconds.")
-        #     time.sleep(30)
-        #     continue
-
-        response.raise_for_status()
+        try:
+            response = requests.get(url, headers=headers, timeout=10)
+            response.raise_for_status()
+        except RequestException as e:
+            print(f"Request failed: {e}")
+            break
 
         soup = BeautifulSoup(response.text, "html.parser")
 
@@ -119,10 +119,14 @@ def scrape_posts():
         posts = json.load(f)
     
     update_cnt = 0
+    scraped_cnt = 0
     skip_cnt = 0
+    total_cnt = 0
     for post in posts:
+        total_cnt += 1
         # skip scraped posts
         if "body" in post and post["body"]:
+            scraped_cnt += 1
             continue
 
         url = post["url"]
@@ -131,10 +135,12 @@ def scrape_posts():
             # print(f"Skipping {url} — Status {response.status_code}")
             skip_cnt += 1
             continue
+        
         soup = BeautifulSoup(response.text, "html.parser")
 
         # body text
-        body_div = soup.find("div", class_="usertext-body")
+        thing = soup.find("div", id=lambda x: x and x.startswith("thing_t3_"))
+        body_div = thing.find("div", class_="usertext-body")
         body_text = body_div.get_text(separator="\n").strip() if body_div else ""
 
         # image
@@ -153,6 +159,7 @@ def scrape_posts():
         # time.sleep(2)
 
     print(f"Updated {update_cnt} posts, skipped {skip_cnt}")
+    print(f"Scraped: {scraped_cnt}; Total: {total_cnt}")
     with open(OUTPUT_FILE, "w") as f:
         json.dump(posts, f, indent=2)
 
