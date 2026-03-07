@@ -16,6 +16,7 @@ import numpy as np
 from MongoDBconnection import MongoDBConnection
 from scraper import scrape_subreddit, scrape_posts, SUBREDDIT_URL_OLD
 from wordcloud import WordCloud, STOPWORDS
+from sklearn.metrics import silhouette_score
 import math
 # nltk.download('stopwords')
 
@@ -136,11 +137,12 @@ def cluster(in_docs, ax, model_name):
     cluster_model = KMeans(n_clusters=5,
                         random_state=560
                             ).fit(out)
-    print("Cluster Centers:")
-    print(cluster_model.cluster_centers_)
+    # print("Cluster Centers:")
+    # print(cluster_model.cluster_centers_)
 
     # predict clusters
     preds = cluster_model.predict(out)
+    print(f"Silhouette Score: {silhouette_score(out, preds)}")
     points_5d = [list(item) for item in out]
     points_x = [point[0] for point in points_5d]
     points_y = [point[1] for point in points_5d]
