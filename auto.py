@@ -17,6 +17,7 @@ from MongoDBconnection import MongoDBConnection
 from scraper import scrape_subreddit, scrape_posts, SUBREDDIT_URL_OLD
 from wordcloud import WordCloud, STOPWORDS
 from sklearn.metrics import silhouette_score
+from sklearn.preprocessing import normalize
 import math
 # nltk.download('stopwords')
 
@@ -133,6 +134,9 @@ def cluster(in_docs, ax, model_name):
 
         out = [bow(doc) for doc in docs]
 
+    # remove magnitude-based signal for Doc2Vec
+    out = normalize(out)
+    
     # define and fit cluster model
     cluster_model = KMeans(n_clusters=5,
                         random_state=560
