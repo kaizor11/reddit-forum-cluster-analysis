@@ -256,6 +256,8 @@ def main():
         w_preds, w_out_docs = cluster(input, model_name="w2v", ax=ax2)
         plt.tight_layout()
         plt.show()
+        plt.pause(10)
+        plt.close()
 
         print("Preparing visualization...")
         df = pd.DataFrame({

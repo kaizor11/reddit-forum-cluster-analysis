@@ -125,7 +125,7 @@ def scrape_posts():
     for post in posts:
         total_cnt += 1
         # skip scraped posts
-        if "body" in post and post["body"]:
+        if post.get("scraped"):
             scraped_cnt += 1
             continue
 
@@ -146,20 +146,17 @@ def scrape_posts():
         # image
         og_image = soup.find("meta", property="og:image")
         image_url = og_image["content"] if og_image else ""
-
-        # only update if there is data
-        if body_text or image_url:
-            post["body"] = body_text
-            post["image_url"] = image_url
-
-            # keep track of body text updates
-            update_cnt += 1
         
+        post["body"] = body_text
+        post["image_url"] = image_url
+        post["scraped"] = True
+
+        update_cnt += 1
+
         # current testing shows sleeping may not be necessary
         # time.sleep(2)
 
-    print(f"Updated {update_cnt} posts, skipped {skip_cnt}")
-    print(f"Scraped: {scraped_cnt}; Total: {total_cnt}")
+    print(f"Skipped: {skip_cnt} // Scraped: {scraped_cnt + update_cnt} // Total: {total_cnt}")
     with open(OUTPUT_FILE, "w") as f:
         json.dump(posts, f, indent=2)
 
