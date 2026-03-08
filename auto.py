@@ -262,16 +262,16 @@ def main():
 
         print("Preparing visualization...")
         df = pd.DataFrame({
-            'title': d_out_docs,   
-            'cluster_id': d_preds    
+            'cluster_id': d_preds,
+            'title': d_out_docs 
         }).sort_values('cluster_id').reset_index(drop=True)
         df.to_csv("d2v_results.csv", index=False)
         print("Generating wordclouds for D2V")
         plot_wordclouds(df, text_col='title', cluster_col='cluster_id', model_name="d2v")
 
         df = pd.DataFrame({
-            'title': w_out_docs,   
-            'cluster_id': w_preds    
+            'cluster_id': w_preds,
+            'title': w_out_docs
         }).sort_values('cluster_id').reset_index(drop=True)
         df.to_csv("w2v_results.csv", index=False)
         print("Generating wordclouds for W2V")
