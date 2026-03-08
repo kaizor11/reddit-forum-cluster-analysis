@@ -135,7 +135,7 @@ def cluster(in_docs, ax, model_name):
         out = [bow(doc) for doc in docs]
 
     # remove magnitude-based signal for Doc2Vec
-    # out = normalize(out)
+    out = normalize(out)
 
     # define and fit cluster model
     cluster_model = KMeans(n_clusters=5,
