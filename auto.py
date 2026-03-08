@@ -236,10 +236,10 @@ def main():
 
     while True:
     # for i in range(1):
-        #scrape data
+        # scrape data
         # scrape()
 
-        #store data
+        # store data
         # store()
 
         # retrieve data
@@ -255,7 +255,7 @@ def main():
         d_preds, d_out_docs = cluster(input, model_name="d2v", ax=ax1)
         w_preds, w_out_docs = cluster(input, model_name="w2v", ax=ax2)
         plt.tight_layout()
-        plt.show()
+        plt.show(block=False)
         plt.pause(10)
         plt.close()
 
@@ -264,6 +264,7 @@ def main():
             'title': d_out_docs,   
             'cluster_id': d_preds    
         })
+        df.to_csv("d2v_results", index=False)
         print("Generating wordclouds for D2V")
         plot_wordclouds(df, text_col='title', cluster_col='cluster_id', model_name="d2v")
 
@@ -271,6 +272,7 @@ def main():
             'title': w_out_docs,   
             'cluster_id': w_preds    
         })
+        df.to_csv("w2v_results", index=False)
         print("Generating wordclouds for W2V")
         plot_wordclouds(df, text_col='title', cluster_col='cluster_id', model_name="w2v")
         
