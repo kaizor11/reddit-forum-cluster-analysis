@@ -135,8 +135,8 @@ def cluster(in_docs, ax, model_name):
         out = [bow(doc) for doc in docs]
 
     # remove magnitude-based signal for Doc2Vec
-    out = normalize(out)
-    
+    # out = normalize(out)
+
     # define and fit cluster model
     cluster_model = KMeans(n_clusters=5,
                         random_state=560
@@ -205,7 +205,7 @@ def cluster(in_docs, ax, model_name):
     cursor.connect("add", display_annotations)
 
     # predict clusters
-    return preds, [" ".join(doc) for doc in docs]
+    return preds, [" ".join(doc) for doc in docs], out
 
 def plot_wordclouds(df, text_col, cluster_col, model_name):
     if df.empty: return
@@ -235,6 +235,31 @@ def plot_wordclouds(df, text_col, cluster_col, model_name):
     # print("Wordcloud saved as 'cluster_result.png'")
     # plt.show()
 
+def plot_elbow(out_d2v, out_w2v, k_range=range(2, 11)):
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5))
+    fig.suptitle("Elbow Plot: Doc2Vec vs Word2Vec + BoW")
+
+    for ax, out, title in [
+        (ax1, out_d2v, "Doc2Vec"),
+        (ax2, out_w2v, "Word2Vec + BoW")
+    ]:
+        inertias = []
+        for k in k_range:
+            km = KMeans(n_clusters=k, random_state=560).fit(out)
+            inertias.append(km.inertia_)
+
+        ax.plot(list(k_range), inertias, marker='o')
+        ax.set_title(title)
+        ax.set_xlabel("Number of Clusters (k)")
+        ax.set_ylabel("Inertia")
+        ax.axvline(x=5, color='red', linestyle='--', alpha=0.5, label='current k=5')
+        ax.legend()
+
+    plt.tight_layout()
+    plt.savefig("elbow_plot.png")
+    plt.show(block=False)
+    plt.pause(10)
+    plt.close()
 
 def main():
 
@@ -256,14 +281,19 @@ def main():
         # cluster data
         fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 6))
         fig.suptitle("Cluster Comparison: Doc2Vec vs Word2Vec + BoW")
-        d_preds, d_out_docs = cluster(input, model_name="d2v", ax=ax1)
-        w_preds, w_out_docs = cluster(input, model_name="w2v", ax=ax2)
+        d_preds, d_out_docs, d_out = cluster(input, model_name="d2v", ax=ax1)
+        w_preds, w_out_docs, w_out = cluster(input, model_name="w2v", ax=ax2)
         plt.tight_layout()
         plt.savefig("cluster.png")
         plt.show(block=False)
         plt.pause(10)
         plt.close()
 
+        # elbow plot
+        print("Generating elbow plots...")
+        plot_elbow(d_out, w_out)
+
+        # wordcloud
         print("Preparing visualization...")
         df = pd.DataFrame({
             'cluster_id': d_preds,
