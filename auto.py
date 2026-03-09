@@ -134,6 +134,49 @@ def cluster(in_docs, ax, model_name):
 
         out = [bow(doc) for doc in docs]
 
+    elif model_name == "w2v_binning":
+        print(f"Model: word2vec binning strategy")
+        # fit and predict word2vec vectors for all words
+        model = Word2Vec(docs,
+                         vector_size=5,
+                         window=2,
+                         min_count=1,
+                         workers=4)
+
+        # gather all word vectors
+        words = [] # contains word vectors
+        spent_words = set() # quick comparison to detect which words have been added
+        word_index = [] # add actual words here so that we can identify the individual vectors in "words" list
+
+        for doc in docs:
+            for word in doc:
+                if word not in spent_words:
+                    spent_words.add(word)
+                    if word in model.wv:
+                        words.append(model.wv[word]) 
+                        word_index.append(word)
+
+        # cluster all words to create bins
+        kmeans_model = KMeans(n_clusters=5,
+                        random_state=560
+                            ).fit(words)
+
+        preds = list(kmeans_model.predict(words))
+
+        # build a dictionary linking each word with its predicted cluster
+        link_dict = {}
+        for i in range(len(preds)):
+            link_dict[word_index[i]] = preds[i]
+            
+        # encode document vectors using bins
+        out = []
+        for doc in docs:
+            docvec = [0,0,0,0,0]
+            for word in doc:
+                if word in link_dict.keys():
+                    docvec[link_dict[word]] += 1
+                    out.append(docvec)    
+
     # remove magnitude-based signal for Doc2Vec
     out = normalize(out)
 
@@ -182,20 +225,6 @@ def cluster(in_docs, ax, model_name):
         
         cursor.annotation.set_text(f'{in_docs[doc_ind]}')
 
-
-    # fig = plt.figure()
-    # #ax = fig.add_subplot(projection='3d')
-    # plt.scatter(points_x, 
-    #             points_y, 
-    #             #points_z, 
-    #             c=preds
-    #             )
-    # plt.tight_layout()
-
-    # cursor = mpl.cursor(hover=True)
-    # cursor.connect("add", display_annotations)
-    # # plt.savefig(f"scatter_{model_name}.png")
-    # plt.show()
 
     # plot graphs together
     ax.scatter(points_x, points_y, c=preds)
@@ -282,7 +311,7 @@ def main():
         fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 6))
         fig.suptitle("Cluster Comparison: Doc2Vec vs Word2Vec + BoW")
         d_preds, d_out_docs, d_out = cluster(input, model_name="d2v", ax=ax1)
-        w_preds, w_out_docs, w_out = cluster(input, model_name="w2v", ax=ax2)
+        w_preds, w_out_docs, w_out = cluster(input, model_name="w2v_binning", ax=ax2)
         plt.tight_layout()
         plt.savefig("cluster.png")
         plt.show(block=False)
