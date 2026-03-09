@@ -4,7 +4,7 @@ from datasets import load_dataset
 from gensim.models.doc2vec import Doc2Vec, TaggedDocument
 from gensim.models.word2vec import Word2Vec
 from gensim.utils import tokenize
-from sklearn.cluster import KMeans
+from sklearn.cluster import KMeans, AgglomerativeClustering
 import matplotlib.pyplot as plt
 import pandas as pd
 import json
@@ -157,11 +157,13 @@ def cluster(in_docs, ax, model_name):
                         word_index.append(word)
 
         # cluster all words to create bins
-        kmeans_model = KMeans(n_clusters=5,
-                        random_state=560
+        hierarchical_model = AgglomerativeClustering(n_clusters=5,
+                        #random_state=560,
+                        linkage="average",
+                        metric="cosine"
                             ).fit(words)
 
-        preds = list(kmeans_model.predict(words))
+        preds = list(hierarchical_model.labels_)
 
         # build a dictionary linking each word with its predicted cluster
         link_dict = {}
@@ -175,7 +177,7 @@ def cluster(in_docs, ax, model_name):
             for word in doc:
                 if word in link_dict.keys():
                     docvec[link_dict[word]] += 1
-                    out.append(docvec)    
+            out.append(docvec)    
 
     # remove magnitude-based signal for Doc2Vec
     out = normalize(out)
