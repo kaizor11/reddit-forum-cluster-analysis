@@ -1,10 +1,10 @@
 # reddit-forum-cluster-analysis
-A python script that automatically scrapes the subreddit: r/shittysuperpowers for new posts and store them in a MongoDB Atlas database. We then cluster the data with KMeans and WordCloud
+A Python script that automatically scrapes the subreddit: r/shittysuperpowers for new posts and stores them in a MongoDB Atlas database. We then cluster the data with KMeans and visualize the resulting clusters using matplotlib and WordCloud.
 
 `auto.py` is the main program and performs the following:
 - scrape the r/shittysuperpowers subreddit for new posts and update old ones if they were skipped in previous iterations (due to Reddit scrape block)
 - stores the scraped data in a MongoDB Atlas database
-- cluters the text data
+- clusters the text data
 
 **Setup** <br>
 - Install dependencies using `pip install -r requirements.txt`
